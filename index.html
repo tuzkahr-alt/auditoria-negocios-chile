@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditoría Negocios Chile — Sin Sitio Web</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">📍</span>
+      <div>
+        <h1>Auditoría Negocios</h1>
+        <p>Chile — Sin sitio web</p>
+      </div>
+    </div>
+
+    <div class="section-title">Búsqueda</div>
+
+    <div class="field">
+      <label>Ciudad / Zona</label>
+      <input type="text" id="city" placeholder="Ej: Santiago, Viña del Mar" value="Santiago, Chile" />
+    </div>
+
+    <div class="field">
+      <label>Tipo de negocio</label>
+      <select id="category">
+        <option value="todos">Todos los tipos</option>
+        <option value="restaurant">Restaurantes y cafés</option>
+        <option value="store">Tiendas y comercios</option>
+        <option value="hair_care">Peluquerías y estética</option>
+        <option value="car_repair">Talleres mecánicos</option>
+        <option value="gym">Gimnasios y deportes</option>
+        <option value="lodging">Hospedajes y hoteles</option>
+        <option value="supermarket">Supermercados</option>
+        <option value="pharmacy">Farmacias</option>
+        <option value="dentist">Dentistas y salud</option>
+        <option value="lawyer">Abogados y servicios</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Radio de búsqueda</label>
+      <select id="radius">
+        <option value="1000">1 km</option>
+        <option value="2500" selected>2.5 km</option>
+        <option value="5000">5 km</option>
+        <option value="10000">10 km</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" id="searchBtn" onclick="startSearch()">
+      🔍 Buscar negocios
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="section-title">Resultados</div>
+    <div class="stats" id="stats">
+      <div class="stat"><span id="totalFound">0</span><small>encontrados</small></div>
+      <div class="stat"><span id="totalNoWeb">0</span><small>sin web</small></div>
+      <div class="stat"><span id="totalWithPhone">0</span><small>con teléfono</small></div>
+    </div>
+
+    <button class="btn-secondary" id="exportBtn" onclick="exportToExcel()" disabled>
+      ⬇ Exportar Excel
+    </button>
+
+    <div class="divider"></div>
+
+    <div class="section-title">API Key</div>
+    <div class="field">
+      <input type="password" id="apiKey" placeholder="AIza..." />
+      <button class="btn-link" onclick="saveKey()">Guardar</button>
+    </div>
+    <p class="hint"><a href="https://console.cloud.google.com" target="_blank">¿No tienes key? Créala gratis →</a></p>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="filter-bar">
+        <input type="text" id="filterInput" placeholder="Filtrar por nombre, dirección, categoría..." oninput="filterResults()" />
+        <select id="sortSelect" onchange="sortResults()">
+          <option value="name">Ordenar: nombre</option>
+          <option value="rating">Ordenar: mejor rating</option>
+          <option value="reviews">Ordenar: más reseñas</option>
+        </select>
+      </div>
+      <div class="view-toggle">
+        <button id="viewCards" class="active" onclick="setView('cards')">▦ Tarjetas</button>
+        <button id="viewList" onclick="setView('list')">≡ Lista</button>
+      </div>
+    </div>
+
+    <!-- STATUS BANNER -->
+    <div id="statusBanner" class="status-banner hidden">
+      <span id="statusMsg">Buscando...</span>
+      <div class="loader" id="loader"></div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="emptyState" class="empty-state">
+      <div class="empty-icon">🗺️</div>
+      <h2>Ingresa tu API Key y haz una búsqueda</h2>
+      <p>Encontrarás negocios registrados en Google Maps que <strong>no tienen sitio web</strong> — oportunidades directas de contacto.</p>
+      <div class="steps">
+        <div class="step"><span>1</span> Pega tu API Key de Google en el panel izquierdo</div>
+        <div class="step"><span>2</span> Escribe la ciudad o zona a buscar</div>
+        <div class="step"><span>3</span> Elige el tipo de negocio y el radio</div>
+        <div class="step"><span>4</span> Presiona "Buscar negocios"</div>
+      </div>
+    </div>
+
+    <!-- RESULTS GRID -->
+    <div id="resultsGrid" class="results-grid hidden"></div>
+
+    <!-- RESULTS LIST -->
+    <div id="resultsList" class="results-list hidden">
+      <table>
+        <thead>
+          <tr>
+            <th>Negocio</th>
+            <th>Categoría</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Rating</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- MODAL DETALLE -->
+  <div id="modal" class="modal-overlay hidden" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
